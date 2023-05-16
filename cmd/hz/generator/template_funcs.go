@@ -19,13 +19,20 @@ package generator
 import (
 	"text/template"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/cloudwego/hertz/cmd/hz/util"
 )
 
-var funcMap = template.FuncMap{
-	"GetUniqueHandlerOutDir": getUniqueHandlerOutDir,
-	"ToSnakeCase":            util.ToSnakeCase,
-}
+var funcMap = func() template.FuncMap {
+	m := template.FuncMap{
+		"GetUniqueHandlerOutDir": getUniqueHandlerOutDir,
+		"ToSnakeCase":            util.ToSnakeCase,
+	}
+	for key, f := range sprig.FuncMap() {
+		m[key] = f
+	}
+	return m
+}()
 
 // getUniqueHandlerOutDir uses to get unique "api.handler_path"
 func getUniqueHandlerOutDir(methods []*HttpMethod) (ret []string) {
